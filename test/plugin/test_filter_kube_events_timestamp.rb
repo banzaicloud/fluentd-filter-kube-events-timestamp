@@ -25,18 +25,18 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
   end
 
   def test_config_mapped_time_key()
-    data={'event.eventTime' => '','event.lastTimestamp'  => '', 'event.firstTimestamp' => ''}
+    data={'event.eventTime' => nil, 'event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil}
     d = create_driver('mapped_time_key "foobar"')
     d.run(default_tag: 'test') do
       d.feed({'test' => 'config_mapped_time_key'}.merge(data))
     end
     filtered = d.filtered.map {|e| e.last}.first
     puts "result => " + filtered.to_s
-    assert_true(filtered['foobar'] != nil)
+    assert_false(filtered['foobar'].to_s.empty?)
   end
 
   def test_config_timestamp_fields()
-    data={'event.eventTime' => 'also set','event.lastTimestamp'  => '', 'event.firstTimestamp' => '', 'foo' => 'SET', 'bar' => '', 'baz' => ''}
+    data={'event.eventTime' => 'also set','event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil, 'foo' => 'SET', 'bar' => nil, 'baz' => nil}
     d = create_driver('timestamp_fields ["foo","bar","baz"]')
     d.run(default_tag: 'test') do
       d.feed({'test' => 'timestamp_fields'}.merge(data))
@@ -47,7 +47,7 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
   end
 
   def test_notime()
-    data={'event.eventTime' => '','event.lastTimestamp'  => '', 'event.firstTimestamp' => ''}
+    data={'event.eventTime' => nil,'event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil}
     puts "testcase => " + data.to_s
     d = create_driver
     d.run(default_tag: 'test') do
@@ -55,18 +55,18 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
     end
     filtered = d.filtered.map {|e| e.last}.first
     puts "result => " + filtered.to_s
-    assert_true(filtered['triggerts'] != nil)
+    assert_false(filtered['triggerts'].to_s.empty?)
   end
 
   def test_expected_mappings()
     data=[
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => '', 'event.firstTimestamp' => ''},
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => 'notempty', 'event.firstTimestamp' => ''},
+      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil},
+      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => 'notempty', 'event.firstTimestamp' => nil},
       {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => 'notempty', 'event.firstTimestamp' => 'alsonotempty'},
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => '', 'event.firstTimestamp' => 'nonempty'},
-      {'expected' => 'event.lastTimestamp', 'event.eventTime' => '','event.lastTimestamp'  => 'exists', 'event.firstTimestamp' => ''},
-      {'expected' => 'event.lastTimestamp', 'event.eventTime' => '','event.lastTimestamp'  => 'exists', 'event.firstTimestamp' => 'alsoexists'},
-      {'expected' => 'event.firstTimestamp', 'event.eventTime' => '','event.lastTimestamp'  => '', 'event.firstTimestamp' => 'exists'}
+      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => nil, 'event.firstTimestamp' => 'nonempty'},
+      {'expected' => 'event.lastTimestamp', 'event.eventTime' => nil,'event.lastTimestamp'  => 'exists', 'event.firstTimestamp' => nil},
+      {'expected' => 'event.lastTimestamp', 'event.eventTime' => nil,'event.lastTimestamp'  => 'exists', 'event.firstTimestamp' => 'alsoexists'},
+      {'expected' => 'event.firstTimestamp', 'event.eventTime' => nil,'event.lastTimestamp'  => nil, 'event.firstTimestamp' => 'exists'}
     ]
     data.each do |testcase|
       puts "testcase => " + testcase.to_s
@@ -76,7 +76,7 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
       end
       filtered = d.filtered.map {|e| e.last}.first
       puts "result => " + filtered.to_s
-      assert_equal(filtered['triggerts'], filtered[filtered['expected']])
+      assert_equal(filtered[filtered['expected']], filtered['triggerts'])
     end
   end
 
