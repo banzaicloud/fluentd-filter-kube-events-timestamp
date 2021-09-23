@@ -47,7 +47,8 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
   end
 
   def test_notime()
-    data={'event.eventTime' => nil,'event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil}
+    # data={'event.eventTime' => nil,'event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil}
+    data={'event' => {'eventTime' => nil, 'lastTimestamp'  => nil, 'firstTimestamp' => nil}}
     puts "testcase => " + data.to_s
     d = create_driver
     d.run(default_tag: 'test') do
@@ -60,13 +61,13 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
 
   def test_expected_mappings()
     data=[
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => nil, 'event.firstTimestamp' => nil},
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => 'notempty', 'event.firstTimestamp' => nil},
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => 'notempty', 'event.firstTimestamp' => 'alsonotempty'},
-      {'expected' => 'event.eventTime', 'event.eventTime' => '2021-09-21T21:39:16.000+0200','event.lastTimestamp'  => nil, 'event.firstTimestamp' => 'nonempty'},
-      {'expected' => 'event.lastTimestamp', 'event.eventTime' => nil,'event.lastTimestamp'  => 'exists', 'event.firstTimestamp' => nil},
-      {'expected' => 'event.lastTimestamp', 'event.eventTime' => nil,'event.lastTimestamp'  => 'exists', 'event.firstTimestamp' => 'alsoexists'},
-      {'expected' => 'event.firstTimestamp', 'event.eventTime' => nil,'event.lastTimestamp'  => nil, 'event.firstTimestamp' => 'exists'}
+      {'expected' => 'event.eventTime', 'event'=> {'eventTime' => '2021-09-21T21:39:16.000+0200','lastTimestamp'  => nil, 'firstTimestamp' => nil}},
+      {'expected' => 'event.eventTime', 'event'=> {'eventTime' => '2021-09-21T21:39:16.000+0200','lastTimestamp'  => 'notempty', 'firstTimestamp' => nil}},
+      {'expected' => 'event.eventTime', 'event'=> {'eventTime' => '2021-09-21T21:39:16.000+0200','lastTimestamp'  => 'notempty', 'firstTimestamp' => 'alsonotempty'}},
+      {'expected' => 'event.eventTime', 'event'=> {'eventTime' => '2021-09-21T21:39:16.000+0200','lastTimestamp'  => nil, 'firstTimestamp' => 'nonempty'}},
+      {'expected' => 'event.lastTimestamp', 'event'=> {'eventTime' => nil,'lastTimestamp'  => 'exists', 'firstTimestamp' => nil}},
+      {'expected' => 'event.lastTimestamp', 'event'=> {'eventTime' => nil,'lastTimestamp'  => 'exists', 'firstTimestamp' => 'alsoexists'}},
+      {'expected' => 'event.firstTimestamp', 'event'=> {'eventTime' => nil,'lastTimestamp'  => nil, 'firstTimestamp' => 'exists'}}
     ]
     data.each do |testcase|
       puts "testcase => " + testcase.to_s
@@ -76,7 +77,7 @@ class TestKubEventsTimestampFilter < Test::Unit::TestCase
       end
       filtered = d.filtered.map {|e| e.last}.first
       puts "result => " + filtered.to_s
-      assert_equal(filtered[filtered['expected']], filtered['triggerts'])
+      assert_equal(getin(filtered, filtered['expected']), filtered['triggerts'])
     end
   end
 

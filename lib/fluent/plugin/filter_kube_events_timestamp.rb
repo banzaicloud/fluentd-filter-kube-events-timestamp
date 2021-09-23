@@ -1,5 +1,13 @@
 require 'fluent/plugin/filter'
 
+def decomposite_key(key)
+  key.split('.')
+end
+
+def getin(hash, key)
+  hash.dig(*decomposite_key(key))
+end
+
 module Fluent::Plugin
   class KubEventsTimestampFilter < Filter
 
@@ -26,7 +34,7 @@ module Fluent::Plugin
 
     def filter(tag, time, record)
 
-      record[@mapped_time_key] = (record[@timestamp_fields[0]].to_s.empty?) ? (record[@timestamp_fields[1]].to_s.empty?) ? record[@timestamp_fields[2]] : record[@timestamp_fields[1]] : record[@timestamp_fields[0]]
+      record[@mapped_time_key] = (getin(record,@timestamp_fields[0]).to_s.empty?) ? (getin(record,@timestamp_fields[1]).to_s.empty?) ? getin(record,@timestamp_fields[2]) : getin(record,@timestamp_fields[1]) : getin(record,@timestamp_fields[0])
 
       if record[@mapped_time_key].to_s.empty?
         record[@mapped_time_key] = Time.at(time.is_a?(Fluent::EventTime) ? time.to_int : time).strftime(@strftime_format)

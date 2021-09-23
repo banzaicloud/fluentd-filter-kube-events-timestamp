@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-kube-events-timestamp"
-  spec.version = "0.1.1"
+  spec.version = "0.1.2"
   spec.authors = ["Banzai Cloud"]
   spec.email   = ["info@banzaicloud.com"]
   spec.description   = %q{fluent filter plugin to map multiple timestamps into an additional one}
