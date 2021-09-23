@@ -34,7 +34,11 @@ module Fluent::Plugin
 
     def filter(tag, time, record)
 
-      record[@mapped_time_key] = (getin(record,@timestamp_fields[0]).to_s.empty?) ? (getin(record,@timestamp_fields[1]).to_s.empty?) ? getin(record,@timestamp_fields[2]) : getin(record,@timestamp_fields[1]) : getin(record,@timestamp_fields[0])
+      vals=@timestamp_fields.map do |field|; getin(record, field); end
+
+      record[@mapped_time_key] = (vals[0].to_s.empty?) ? (vals[1].to_s.empty?) ? vals[2] : vals[1] : vals[0]
+
+      # record[@mapped_time_key] = (getin(record,@timestamp_fields[0]).to_s.empty?) ? (getin(record,@timestamp_fields[1]).to_s.empty?) ? getin(record,@timestamp_fields[2]) : getin(record,@timestamp_fields[1]) : getin(record,@timestamp_fields[0])
 
       if record[@mapped_time_key].to_s.empty?
         record[@mapped_time_key] = Time.at(time.is_a?(Fluent::EventTime) ? time.to_int : time).strftime(@strftime_format)
